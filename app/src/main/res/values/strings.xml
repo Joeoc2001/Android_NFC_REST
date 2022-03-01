@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">TerminalEmulation</string>
+    <string name="emv_read">Read EMV Card</string>
+</resources>
