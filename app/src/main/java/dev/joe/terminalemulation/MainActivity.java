@@ -8,18 +8,22 @@ import android.widget.TextView;
 
 import java.io.IOException;
 
-import ru.skornei.restserver.RestServerManager;
-
 public class MainActivity extends AppCompatActivity {
-    private final EMVRestServer restServer = new EMVRestServer();
+    private EMVRestServer restServer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        RestServerManager.initialize(this.getApplication());
+        NfcAdapter adapter = NfcAdapter.getDefaultAdapter(this);
 
+        ReaderCallback callback = new ReaderCallback(this);
+        adapter.enableReaderMode(this, callback,
+                NfcAdapter.FLAG_READER_NFC_A | NfcAdapter.FLAG_READER_NFC_B, null);
+        log("Listening for card");
+
+        restServer = new EMVRestServer(callback);
         try {
             restServer.start();
         } catch (IOException e) {
@@ -28,12 +32,16 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         log("Started REST server");
+    }
 
-        NfcAdapter adapter = NfcAdapter.getDefaultAdapter(this);
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
 
-        adapter.enableReaderMode(this, new ReaderCallback(this),
-                NfcAdapter.FLAG_READER_NFC_A | NfcAdapter.FLAG_READER_NFC_B, null);
-        log("Listening for card");
+        if (restServer != null) {
+            restServer.stop();
+        }
     }
 
     public void log(String s) {
