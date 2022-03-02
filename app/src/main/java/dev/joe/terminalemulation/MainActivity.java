@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -22,6 +23,9 @@ public class MainActivity extends AppCompatActivity {
         adapter.enableReaderMode(this, callback,
                 NfcAdapter.FLAG_READER_NFC_A | NfcAdapter.FLAG_READER_NFC_B, null);
         log("Listening for card");
+
+        // Don't go into standby since that disables the reader mode
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         restServer = new EMVRestServer(callback);
         try {
