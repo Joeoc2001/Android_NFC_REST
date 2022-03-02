@@ -15,8 +15,7 @@ public class ReaderCallback implements NfcAdapter.ReaderCallback {
     }
 
     public byte[] transceive(byte[] toSend) throws IOException {
-        if (nfc == null || !nfc.isConnected()) {
-            close();
+        if (!isConnected()) {
             throw new IOException("No NFC card connected");
         }
 
@@ -42,10 +41,13 @@ public class ReaderCallback implements NfcAdapter.ReaderCallback {
                 nfc.close();
             } catch (IOException e) {
                 e.printStackTrace();
+                activity.log("Could not gracefully disconnect from card");
             }
         }
 
         nfc = null;
+
+        activity.log("Card disconnected");
     }
 
     @Override
@@ -62,5 +64,16 @@ public class ReaderCallback implements NfcAdapter.ReaderCallback {
 
         activity.log("Card connected");
         nfc.setTimeout(100);
+    }
+
+    public boolean isConnected() {
+        if (nfc == null) {
+            return false;
+        }
+        if (!nfc.isConnected()) {
+            close();
+            return false;
+        }
+        return true;
     }
 }
