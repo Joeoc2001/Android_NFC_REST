@@ -54,7 +54,7 @@ public class EMVRestServer extends NanoHTTPD {
 
     private Response transceive(Map<String, String> args) {
         String cmd = getOrDefault(args, "cmd", "");
-        byte[] command = hexStringToByteArray(cmd);
+        byte[] command = Util.bytesFromString(cmd);
 
         byte[] resp;
         try {
@@ -66,21 +66,5 @@ public class EMVRestServer extends NanoHTTPD {
 
         String answer = Util.bytesToString(resp);
         return newFixedLengthResponse(answer);
-    }
-
-    public static byte[] hexStringToByteArray(String s) {
-        int len = s.length();
-        if (len % 2 == 1) {
-            return hexStringToByteArray("0" + s);
-        }
-
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) (
-                    (Character.digit(s.charAt(i + 0), 16) << 4) +
-                    (Character.digit(s.charAt(i + 1), 16) << 0)
-            );
-        }
-        return data;
     }
 }

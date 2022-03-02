@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         log("Started REST server");
+        log("IP: " + Util.getIPAddress(true) + ":8080");
     }
 
     @Override
